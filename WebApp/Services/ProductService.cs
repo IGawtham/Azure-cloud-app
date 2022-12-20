@@ -3,21 +3,16 @@ using WebApp.Models;
 
 namespace WebApp.Services
 {
-    public class ProductService
+    public class ProductService : IProductService
     {
-        private static string db_source = "sqldb00.database.windows.net";
-        private static string db_user = "dbadmin";
-        private static string db_password = "Password$";
-        private static string _db = "appdb";
-
+        private readonly IConfiguration configuration;
+        public ProductService(IConfiguration _configuration)
+        {
+            configuration = _configuration;
+        }
         private SqlConnection GetConnection()
         {
-            var _builer = new SqlConnectionStringBuilder();
-            _builer.DataSource = db_source;
-            _builer.UserID = db_user;
-            _builer.Password = db_password;
-            _builer.InitialCatalog = _db;
-            return new SqlConnection(_builer.ConnectionString);
+            return new SqlConnection(configuration.GetConnectionString("SQLConnection"));
         }
 
         public List<Product> GetProducts()
