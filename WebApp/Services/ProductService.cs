@@ -1,4 +1,5 @@
-﻿using System.Data.SqlClient;
+﻿using Microsoft.FeatureManagement;
+using System.Data.SqlClient;
 using WebApp.Models;
 
 namespace WebApp.Services
@@ -6,15 +7,25 @@ namespace WebApp.Services
     public class ProductService : IProductService
     {
         private readonly IConfiguration configuration;
-        public ProductService(IConfiguration _configuration)
+        private readonly IFeatureManager featureManager;
+        public ProductService(IConfiguration _configuration, IFeatureManager _featureManager)
         {
             configuration = _configuration;
+            featureManager = _featureManager;
         }
         private SqlConnection GetConnection()
         {
             return new SqlConnection(configuration.GetConnectionString("SQLConnection"));
         }
-
+        //To ceck feature flag is enabled or not --beta feature name
+        public async Task<bool> IsBeta()
+        {
+            if (await featureManager.IsEnabledAsync("beta"))
+            {
+                return true;
+            }
+            return false;
+        }
         public List<Product> GetProducts()
         {
             SqlConnection conn = GetConnection();
